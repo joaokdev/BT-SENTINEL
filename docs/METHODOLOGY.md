@@ -4,9 +4,9 @@
 
 O scanner escuta anúncios Bluetooth Low Energy em modo passivo por meio do Bleak. Não estabelece conexão com periféricos e não executa leituras ou escritas GATT. Anúncios podem omitir campos, conter valores mutáveis ou utilizar endereços aleatorizados. Um dispositivo que não aparece durante uma janela de descoberta não está necessariamente ausente.
 
-## 2. Descoberta Bluetooth Classic
+## 2. Descoberta via BlueZ no Linux
 
-No Linux, o scanner pode utilizar a consulta local do BlueZ `bluetoothctl` e interpretar as observações retornadas. Essa etapa transmite o inquiry Bluetooth Classic padrão; não é escuta passiva, mas também não estabelece conexão ou pareamento. Esse recurso não é apresentado como multiplataforma. Na versão atual, Windows e Linux podem utilizar BLE passivo. O backend macOS do Bleak não oferece modo passivo, portanto BLE é desabilitado no macOS para preservar essa propriedade.
+No Linux, o scanner pode iniciar a descoberta padrão do BlueZ por `bluetoothctl scan on`. O BlueZ controla os transportes disponíveis e pode apresentar anúncios LE e dispositivos BR/EDR, conforme o adaptador e a versão do sistema. Por isso, os resultados são rotulados como `BlueZ`, e não como prova de Bluetooth Classic exclusivamente. Essa operação emite tráfego normal de descoberta e não estabelece conexão nem pareamento. O Windows usa BLE passivo nesta versão. O backend macOS do Bleak não oferece modo passivo, portanto BLE é desabilitado no macOS para preservar essa propriedade.
 
 ## 3. Interpretação de RSSI
 

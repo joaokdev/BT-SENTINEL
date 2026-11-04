@@ -1,145 +1,203 @@
-# BT SENTINEL
+# BT SENTINEL 4.0.0
 
-Ferramenta educacional para observação e inventário de dispositivos Bluetooth em ambientes controlados. O projeto oferece uma interface de terminal para descoberta de dispositivos próximos, consulta local do adaptador e organização das observações em inventário e relatório HTML.
+**Central de Inteligência Bluetooth · PAI JOÃO K DEV**
 
-## Finalidade acadêmica e uso autorizado
+O BT SENTINEL é um projeto educacional para descoberta Bluetooth autorizada, organização de inventário, classificação heurística de dispositivos, check-up local do adaptador e integração com os controles de pareamento e áudio do próprio sistema operacional.
 
-O BT SENTINEL foi desenvolvido para fins educativos e acadêmicos, como apoio a aulas, laboratórios, demonstrações e estudos sobre descoberta Bluetooth, anúncios BLE, metadados de dispositivos e tratamento responsável de dados técnicos. Pode ser utilizado em atividades de ensino e pesquisa realizadas em equipamentos próprios, laboratórios isolados ou ambientes nos quais o operador tenha autorização explícita.
+> **Uso autorizado.** Utilize somente equipamentos seus ou ambientes em que você tenha autorização explícita. A aplicação não invade, não contorna pareamento e não assume o controle de dispositivos encontrados. O pareamento ocorre na interface oficial do Windows/Linux, com confirmação do operador e do dispositivo.
 
-> **Autorização e privacidade:** antes de iniciar uma descoberta, obtenha autorização do responsável pelo ambiente. Dispositivos próximos podem pertencer a terceiros; nomes, identificadores, intensidade de sinal e dados de fabricante podem ser sensíveis. Colete apenas o necessário, mantenha os arquivos protegidos e remova-os quando deixarem de ser necessários. O uso da ferramenta não substitui a aprovação institucional ou as regras aplicáveis a uma atividade acadêmica.
+## Novidades da versão 4.0
 
-## O que o projeto faz
+- Interface de terminal inteiramente em português, com assinatura visual **PAI JOÃO K DEV**.
+- Menu simplificado: descoberta, inteligência/inventário, check-up, pareamento, central de áudio, relatórios e ajuda.
+- Tabela de descoberta ao vivo, com atualização enquanto a busca está em andamento.
+- Classificação provável de famílias de dispositivos (fone/headset, caixa de som, smartphone, smartwatch, computador, TV, controle, HID, impressora, sensor/IoT ou não identificado).
+- A classificação informa nível de confiança e evidências. É heurística, pode errar e não afirma modelo, dono ou vulnerabilidade.
+- Fluxo de pareamento que abre as configurações Bluetooth oficiais do sistema; o usuário seleciona o dispositivo e confirma o pareamento no sistema e no próprio aparelho.
+- Central de áudio que abre as configurações de saída, abre arquivo de áudio local ou página HTTPS do YouTube e envia comandos de mídia/volume à sessão ou saída padrão do computador.
+- Registros de auditoria e relatórios mantidos localmente.
+- Mensagens de interface e documentação em português.
 
-- Apresenta um painel interativo no terminal para iniciar descobertas e consultar resultados.
-- Observa anúncios Bluetooth Low Energy (BLE) de forma passiva em Windows e Linux compatíveis.
-- No Linux, permite descoberta próxima de Bluetooth Classic por meio da consulta padrão de inquiry do BlueZ. Essa operação transmite sinais de descoberta, mas não estabelece conexão nem pareamento.
-- Faz uma consulta local, somente leitura, ao estado e às informações disponíveis do adaptador Bluetooth.
-- Mantém um inventário local com identificadores observados, metadados anunciados, primeira e última observação, contagem de observações e RSSI quando disponível.
-- Gera um relatório HTML independente a partir do inventário.
-- Registra eventos da sessão para apoiar a revisão do procedimento realizado.
+## O que cada módulo realmente faz
 
-O RSSI é uma indicação aproximada da intensidade do sinal e não permite determinar com precisão a distância. Identificadores, UUIDs e dados de fabricante são observações; isoladamente, não comprovam identidade, propriedade, vulnerabilidade ou exposição de um serviço.
+| Módulo | O que faz | Limite importante |
+|---|---|---|
+| Descobrir dispositivos | Observa anúncios BLE e, no Linux, pode usar descoberta BlueZ | Não conecta nem pareia os encontrados |
+| Inteligência / inventário | Classifica por nome/UUID observado e guarda histórico | A classificação é uma hipótese, não identificação forense |
+| Check-up | Consulta informações do adaptador local | No Windows, a consulta PnP não prova por si só que o rádio está ligado |
+| Parear dispositivo | Abre a tela Bluetooth oficial do sistema | O ID de rádio não é senha/chave de acesso; pareamento exige confirmação normal |
+| Central de áudio | Abre seletor de saída, reproduz arquivo/YouTube no player/navegador padrão e controla a sessão local | Os controles não são enviados para um endereço Bluetooth específico; atuam na sessão/saída padrão do PC |
+| Relatório | Gera HTML com dados do inventário e check-up local | Não é laudo de vulnerabilidade |
 
-## Escopo e limitações
+## Compatibilidade por plataforma
 
-| Recurso | Windows | Linux | macOS |
-| --- | --- | --- | --- |
-| Descoberta passiva de anúncios BLE | Sim, conforme adaptador e permissões | Sim, conforme adaptador e permissões | Não incluída |
-| Descoberta Bluetooth Classic | Não incluída | Sim, via BlueZ | Não incluída |
-| Auditoria local do adaptador | Inventário Bluetooth PnP | Estado via `bluetoothctl show` | Consulta básica via `system_profiler` |
-| Interface de terminal e relatórios HTML | Sim | Sim | Sim, com recursos de rádio limitados |
+| Recurso | Windows 10/11 | Kali Linux / Linux com BlueZ |
+|---|---:|---:|
+| Interface interativa em português | Sim | Sim |
+| Descoberta BLE passiva | Sim, adaptador/driver compatível | Sim, adaptador/BlueZ compatível |
+| Descoberta por BlueZ | Não | Sim, `bluetoothctl`; resultado pode incluir LE e BR/EDR |
+| Classificação heurística | Sim | Sim |
+| Check-up local do adaptador | Inventário Bluetooth PnP | `bluetoothctl show` |
+| Abrir tela oficial de pareamento | Configurações do Windows | Blueman / GNOME / KDE, se instalado |
+| Abrir configuração de saída de áudio | Configurações de Som do Windows | pavucontrol / GNOME / KDE, se instalado |
+| Play/Pause/Next/Previous | Teclas multimídia do Windows | `playerctl` |
+| Volume / mute | Teclas multimídia do Windows | `wpctl` (PipeWire) ou `pactl` (PulseAudio) |
 
-A disponibilidade depende do sistema operacional, do adaptador, dos drivers, das permissões e do estado do serviço Bluetooth. No Windows, o identificador BLE pode ser específico do sistema e não corresponder a um endereço MAC. O backend macOS do Bleak não oferece o modo passivo usado pelo projeto, por isso a descoberta BLE não é habilitada nesse sistema.
+A disponibilidade real depende do adaptador, driver, versão do sistema, permissões e ambiente gráfico. Em Windows, o identificador BLE entregue pelo sistema pode ser um identificador interno em vez de um MAC físico.
 
-A ferramenta não realiza conexão a dispositivos descobertos, enumeração de serviços remotos, pareamento forçado, tentativa de PIN, escrita GATT, spoofing, exploração de vulnerabilidades, interferência ou negação de serviço. A auditoria do adaptador local é somente leitura.
+## Pareamento e áudio: fluxo correto
+
+1. Execute uma descoberta e encontre o dispositivo que você reconhece como seu.
+2. Abra **Parear dispositivo** e selecione o item do inventário.
+3. Confirme que o aparelho é seu/autorizado. O programa abrirá as configurações nativas do sistema.
+4. Na tela do Windows/Linux, selecione o dispositivo e confirme o pareamento; confira o mesmo PIN/código nos dois lados, quando solicitado.
+5. Abra **Central de áudio** e escolha a saída Bluetooth nas configurações de som do sistema.
+6. Abra um arquivo local compatível ou uma página HTTPS do YouTube. O navegador/player usa a saída padrão selecionada.
+7. Use Play/Pause/Próxima/Anterior e volume. Esses comandos atuam sobre a sessão de mídia/saída padrão do computador.
+
+**Importante:** não existe função “conectar pelo MAC e tomar controle”. O endereço/ID serve para reconhecer registros da descoberta. A aplicação não transmite áudio diretamente por um protocolo Bluetooth privado nem contorna autenticação.
 
 ## Requisitos
 
 - Python 3.10 ou superior.
-- Adaptador Bluetooth compatível para executar atividades de descoberta.
-- No Linux, BlueZ e `bluetoothctl` para a descoberta Classic.
-- No Windows, PowerShell para consultar o inventário local de dispositivos Bluetooth durante a auditoria.
+- Adaptador Bluetooth com suporte BLE para descoberta BLE.
+- Linux: BlueZ/`bluetoothctl` para descoberta pelo serviço Bluetooth do sistema.
+- Linux: `playerctl` para controles de faixa; `wpctl` (PipeWire) ou `pactl` (PulseAudio) para volume.
+- Windows: Bluetooth habilitado e driver funcional; os controles usam as teclas multimídia do sistema.
 
-É possível abrir a interface e consultar funcionalidades sem hardware compatível, mas a descoberta de rádio depende do adaptador e da configuração do sistema.
+## Instalação no Windows
 
-## Como instalar e iniciar
-
-Clone o repositório e entre na pasta do projeto:
-
-```bash
-git clone https://github.com/joaokdev/BT-SENTINEL.git
-cd BT-SENTINEL
-```
-
-### Windows (PowerShell)
+Abra o PowerShell na pasta extraída:
 
 ```powershell
-py -3 -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
-python -m pip install -e .
+powershell -ExecutionPolicy Bypass -File .\scripts\setup_windows.ps1
+```
+
+Inicie:
+
+```powershell
+.\scripts\start_windows.bat
+```
+
+Ou, com o ambiente virtual ativado:
+
+```powershell
 python -m bt_sentinel
 ```
 
-Se a política local bloquear a ativação do ambiente virtual, permita scripts apenas na janela atual do PowerShell e tente novamente:
+### Gerar um executável `.exe` (no próprio Windows)
+
+O ZIP contém o código-fonte e o script de compilação; o `.exe` não é pré-compilado neste pacote. No Windows, depois da instalação, execute:
 
 ```powershell
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-.\.venv\Scripts\Activate.ps1
+powershell -ExecutionPolicy Bypass -File .\scripts\build_windows_exe.ps1
 ```
 
-Como alternativa, o script `scripts/setup_windows.ps1` prepara o ambiente e `scripts/start_windows.bat` inicia a aplicação.
+O resultado esperado é `dist\BT-SENTINEL.exe`. A compilação deve ser validada no Windows com o adaptador e os drivers que serão usados. O executável não inclui drivers Bluetooth do fabricante nem concede acesso a dispositivos sem pareamento normal.
 
-### Linux (Debian, Ubuntu e Kali)
+## Instalação no Kali Linux / Debian / Ubuntu
 
 ```bash
 sudo apt update
-sudo apt install -y python3 python3-venv python3-pip bluez
+sudo apt install -y python3 python3-venv python3-pip bluez playerctl
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 python -m pip install -e .
-python -m bt_sentinel
 ```
 
-Como alternativa, use `bash scripts/setup_linux.sh` para preparar o ambiente e `bash scripts/start_linux.sh` para iniciar a aplicação. Para descoberta Classic, verifique se o serviço BlueZ e o adaptador estão disponíveis. Use somente as permissões necessárias no ambiente autorizado.
+Opcional para volume em PipeWire: instale `wireplumber`/`wpctl`. Em sistemas PulseAudio, use `pactl`.
 
-### macOS
-
-As dependências Python e a interface podem ser instaladas pelo mesmo fluxo de ambiente virtual usado no Linux. A descoberta BLE passiva e a descoberta Classic não estão incluídas no macOS; portanto, o uso nesse sistema fica limitado às funções compatíveis, como interface, inventário, relatórios e consulta local documentada.
-
-## Utilização
-
-O comando abaixo abre o painel interativo:
+Inicie:
 
 ```bash
 python -m bt_sentinel
 ```
 
-No painel, selecione **Live discovery**, defina a duração e o transporte disponíveis e acompanhe os resultados. Ao selecionar um dispositivo, a aplicação exibe os metadados observados. Consulte o inventário ou gere o relatório HTML pelo próprio painel.
-
-Também é possível usar os comandos da linha de comando. Cada operação solicita confirmação explícita de autorização:
+Scripts de conveniência:
 
 ```bash
-# Descoberta BLE e Classic quando disponíveis, por 20 segundos
-python -m bt_sentinel scan --duration 20 --transport all
+bash scripts/setup_linux.sh
+bash scripts/start_linux.sh
+```
 
-# Somente anúncios BLE
+## Uso do painel
+
+1. Confirme que usará o programa em dispositivos/ambientes autorizados.
+2. Escolha **1 · Descobrir dispositivos**.
+3. Defina de 5 a 120 segundos. No Windows, a descoberta disponível é BLE. No Linux, você pode escolher BLE, descoberta BlueZ ou ambos.
+4. Observe a tabela ao vivo e, ao concluir, selecione um item para ver a ficha.
+5. Use **2 · Inteligência / inventário** para inspecionar registros salvos.
+6. Use **3 · Check-up** para verificar o adaptador local.
+7. Use **4 · Parear dispositivo** para abrir as configurações nativas.
+8. Depois do pareamento, use **5 · Central de áudio** para selecionar a saída, abrir áudio e controlar a sessão do PC.
+
+## Comandos de terminal
+
+```bash
+# Painel interativo
+python -m bt_sentinel
+
+# Descoberta BLE por 20 segundos
 python -m bt_sentinel scan --duration 20 --transport ble
 
-# Somente Classic (Linux com BlueZ)
-python -m bt_sentinel scan --duration 20 --transport classic
+# Descoberta BLE + BlueZ no Linux
+python -m bt_sentinel scan --duration 20 --transport all
 
-# Consultar o inventário, auditar o adaptador ou gerar relatório
-python -m bt_sentinel inventory
+# Check-up local
 python -m bt_sentinel audit
+
+# Gerar relatório HTML
 python -m bt_sentinel report
 ```
-
-A duração aceita pela aplicação é limitada ao intervalo de 5 a 120 segundos. Para interromper uma descoberta, pressione `Ctrl+C`.
-
-## Dados gerados
-
-Quando executada na pasta do projeto, a aplicação mantém os dados localmente em `data/`, os relatórios em `reports/` e os registros de sessão em `logs/`. Os arquivos podem incluir identificadores e metadados observados; revise-os antes de compartilhar. Fora da pasta do projeto, os dados são armazenados em `~/.bt-sentinel/` (no perfil do usuário no Windows). Arquivos de dados, relatórios e logs locais são excluídos do controle de versão pelo `.gitignore`.
 
 ## Estrutura
 
 ```text
-bt_sentinel/   implementação da aplicação
-data/          inventário e auditoria locais
-docs/          arquitetura, metodologia e limites de segurança
-logs/          registros locais de sessão
-reports/       relatórios HTML gerados
-scripts/       instalação e inicialização
-tests/         testes automatizados
+BT_SENTINEL_4.0.0/
+├── bt_sentinel/
+│   ├── audit.py             # check-up local de adaptador
+│   ├── cli.py               # entrada CLI
+│   ├── core.py              # inventário, parsing e relatório
+│   ├── device_intel.py      # classificação heurística de dispositivos
+│   ├── scanner.py           # descoberta BLE e BlueZ
+│   ├── system_control.py    # abertura de configurações e mídia local
+│   └── ui.py                # interface Rich em português
+├── data/                    # inventário e check-up local
+├── docs/                    # arquitetura, metodologia e limites
+├── logs/                    # trilha local de auditoria
+├── reports/                 # relatórios HTML
+├── scripts/                 # instalação e inicialização
+├── tests/                   # testes automatizados
+├── pyproject.toml
+└── requirements.txt
 ```
 
-## Referências e documentação
+## Dados e privacidade
 
-Consulte `docs/METHODOLOGY.md` para informações sobre o método de observação, `docs/ARCHITECTURE.md` para a organização interna, `docs/SECURITY_BOUNDARIES.md` para os limites de uso e `docs/REFERENCES.md` para referências técnicas.
+- `data/inventory.json`: nomes, identificadores, RSSI, UUIDs e horários observados.
+- `data/adapter_audit.json`: informações consultadas do adaptador local.
+- `logs/audit.jsonl`: operações realizadas na sessão.
+- `reports/relatorio_bt_sentinel.html`: relatório gerado.
+- Os arquivos são locais. Revise os identificadores antes de compartilhar qualquer relatório.
 
-## Aviso
+## Limites de segurança
 
-O BT SENTINEL é um recurso de aprendizagem e observação defensiva. Não substitui avaliação profissional, documentação do fabricante nem revisão ética, institucional ou jurídica de uma pesquisa. O operador é responsável pela autorização, pelo escopo da atividade e pela proteção dos dados coletados.
+O BT SENTINEL não implementa exploração, invasão, bypass de pareamento, adivinhação de PIN, captura de credenciais, escrita GATT, tomada de controle remota, injeção de áudio, spoofing de endereço, flooding, interferência ou negação de serviço.
+
+A descoberta não prova que um dispositivo está vulnerável ou disponível para conexão. RSSI não é uma medição confiável de distância. Nome, UUID e fabricante podem ser incompletos ou falsificados. A classificação de família é heurística e deve ser tratada como pista visual, não evidência conclusiva.
+
+O módulo de áudio opera por meio da sessão e da saída padrão do próprio computador. O pareamento é tratado pelo sistema operacional. Isso preserva o mecanismo normal de autenticação e autorização Bluetooth.
+
+## Testes
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+Os testes automatizados não exigem hardware Bluetooth real. Eles verificam parsing, classificação, inventário, interface e limites dos controles locais com dependências simuladas. A descoberta física precisa ser validada no notebook/adaptador do operador.
+
+## Aviso educacional
+
+Este repositório é um projeto educacional de observabilidade Bluetooth e gerenciamento local de mídia. Ele não substitui uma avaliação profissional, documentação do fabricante ou aconselhamento jurídico. O operador é responsável por obter autorização, proteger os dados coletados e respeitar as regras aplicáveis.

@@ -4,7 +4,7 @@ set "PROJECT_ROOT=%~dp0.."
 pushd "%PROJECT_ROOT%"
 
 if not exist ".venv\Scripts\python.exe" (
-    echo [!] Environment not found. Run:
+    echo [!] Ambiente virtual não encontrado. Execute:
     echo     powershell -ExecutionPolicy Bypass -File .\scripts\setup_windows.ps1
     popd
     exit /b 1

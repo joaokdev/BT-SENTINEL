@@ -1,12 +1,11 @@
-# Visão da arquitetura
+# Arquitetura 4.0
 
-| Módulo | Responsabilidade |
-|---|---|
-| `cli.py` / `__main__.py` | Entrada do processo e interpretação de comandos |
-| `ui.py` | Painel Rich, tabela em tempo real, seleção e fluxo do operador |
-| `scanner.py` | Callback de anúncios BLE e descoberta Classic via BlueZ no Linux |
-| `audit.py` | Consultas locais e somente leitura do adaptador por plataforma |
-| `core.py` | Normalização, consolidação, persistência JSON atômica e geração HTML |
-| `tests/` | Testes offline de parsing, consolidação, persistência e segurança do relatório |
+- `scanner.py`: descoberta passiva BLE e descoberta padrão BlueZ no Linux.
+- `device_intel.py`: classificação heurística de família, confiança e evidências.
+- `core.py`: normalização, consolidação, persistência e relatório HTML.
+- `audit.py`: consultas locais somente de leitura do adaptador.
+- `system_control.py`: abre configurações nativas de pareamento/áudio, players padrão e comandos de mídia locais.
+- `ui.py`: menu Rich em português, painel de descoberta, inventário, check-up, pareamento e central de áudio.
+- `cli.py`: entrada interativa e subcomandos.
 
-Os callbacks de descoberta enviam observações para a interface. A interface consolida as observações em uma visão de sessão e atualiza o inventário cumulativo. O gerador de relatórios recebe dados estruturados locais e escapa os valores no ponto de inserção do HTML.
+Os módulos de pareamento e áudio não fazem conexão Bluetooth por endereço. O pareamento é delegado à interface do sistema e o áudio usa a sessão/saída padrão do computador.

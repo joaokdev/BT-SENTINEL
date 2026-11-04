@@ -107,13 +107,14 @@ class CoreTests(unittest.TestCase):
         with patch("bt_sentinel.scanner.platform.system", return_value="Darwin"):
             count, error = asyncio.run(scan_ble(1, lambda _record: None))
         self.assertEqual(count, 0)
-        self.assertIn("not supported on macOS", error)
+        self.assertIn("macOS", error)
 
     def test_parse_classic_device_line(self):
         record = parse_classic_device_line("[NEW] Device aa:bb:cc:dd:ee:ff Test Headphones")
         self.assertIsNotNone(record)
         self.assertEqual(record["address"], "AA:BB:CC:DD:EE:FF")
         self.assertEqual(record["name"], "Test Headphones")
+        self.assertEqual(record["transport"], "BlueZ")
         self.assertIsNone(parse_classic_device_line("No Bluetooth device in line"))
         rssi_update = parse_classic_device_line("[CHG] Device AA:BB:CC:DD:EE:FF RSSI: -62")
         self.assertEqual(rssi_update["name"], "Unknown")

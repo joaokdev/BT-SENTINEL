@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "bt-sentinel"
-version = "3.0.0"
-description = "Interactive Bluetooth inventory with passive BLE discovery and local assessment"
+version = "4.0.0"
+description = "Portuguese-first Bluetooth intelligence, inventory and authorized local media control"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [

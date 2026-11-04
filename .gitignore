@@ -16,3 +16,4 @@ reports/*
 !reports/.gitkeep
 .DS_Store
 Thumbs.db
+*.spec

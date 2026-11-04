@@ -46,7 +46,7 @@ class TerminalFlowTests(unittest.TestCase):
             inventory = json.loads((Path(directory) / "data" / "inventory.json").read_text(encoding="utf-8"))
             self.assertEqual(inventory[0]["name"], "Test beacon")
             events = [json.loads(line)["event"] for line in (Path(directory) / "logs" / "audit.jsonl").read_text(encoding="utf-8").splitlines()]
-            self.assertEqual(events, ["DISCOVERY_STARTED", "DISCOVERY_FINISHED"])
+            self.assertEqual(events, ["DESCOBERTA_INICIADA", "DESCOBERTA_FINALIZADA"])
 
 
 if __name__ == "__main__":

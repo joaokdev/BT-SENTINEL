@@ -32,11 +32,11 @@ def audit_local_adapter() -> dict[str, Any]:
     if system == "Linux":
         binary = shutil.which("bluetoothctl")
         if not binary:
-            result["details"].append("bluetoothctl is not installed; local adapter state unavailable.")
+            result["details"].append("bluetoothctl não está instalado; estado do adaptador indisponível.")
             return result
         output = _run_read_only([binary, "show"])
         if not output:
-            result["details"].append("No adapter details returned. Check adapter availability and permissions.")
+            result["details"].append("O adaptador não retornou detalhes. Verifique disponibilidade e permissões.")
             return result
         for key, field in (("Powered", "powered"), ("Discoverable", "discoverable"), ("Pairable", "pairable")):
             match = re.search(rf"(?im)^\s*{key}:\s*(yes|no)\s*$", output)
@@ -49,7 +49,7 @@ def audit_local_adapter() -> dict[str, Any]:
     if system == "Windows":
         powershell = shutil.which("powershell") or shutil.which("pwsh")
         if not powershell:
-            result["details"].append("PowerShell was not found; adapter inventory unavailable.")
+            result["details"].append("PowerShell não encontrado; inventário do adaptador indisponível.")
             return result
         command = (
             "Get-PnpDevice -Class Bluetooth -ErrorAction SilentlyContinue | "
@@ -70,7 +70,7 @@ def audit_local_adapter() -> dict[str, Any]:
                 result["adapter"] = "; ".join(item["name"] for item in result["details"][:3])
                 result["powered"] = "unknown (Windows PnP status is not a radio power-state check)"
         except (json.JSONDecodeError, AttributeError, TypeError):
-            result["details"].append("Windows Bluetooth PnP inventory could not be parsed.")
+            result["details"].append("Não foi possível interpretar o inventário Bluetooth PnP do Windows.")
         return result
 
     if system == "Darwin":
@@ -83,5 +83,5 @@ def audit_local_adapter() -> dict[str, Any]:
             result["details"].append("system_profiler returned no Bluetooth adapter data.")
         return result
 
-    result["details"].append("This operating system is not currently supported for adapter auditing.")
+    result["details"].append("Este sistema operacional não tem suporte para auditoria do adaptador.")
     return result

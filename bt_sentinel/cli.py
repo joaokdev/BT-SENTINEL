@@ -14,15 +14,15 @@ from .ui import SentinelApp
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="bt-sentinel",
-        description="BT SENTINEL — interactive Bluetooth inventory with passive BLE and local assessment",
+        description="BT SENTINEL — inteligência Bluetooth, inventário e controles locais autorizados",
     )
     subparsers = parser.add_subparsers(dest="command")
-    scan = subparsers.add_parser("scan", help="Run live Bluetooth discovery")
-    scan.add_argument("--duration", type=int, default=18, help="Discovery window in seconds (5–120)")
-    scan.add_argument("--transport", choices=("all", "ble", "classic"), default="all")
-    subparsers.add_parser("inventory", help="Show the saved inventory")
-    subparsers.add_parser("audit", help="Audit the local Bluetooth adapter")
-    report = subparsers.add_parser("report", help="Generate a self-contained HTML report")
+    scan = subparsers.add_parser("scan", help="Executa descoberta Bluetooth ao vivo")
+    scan.add_argument("--duration", type=int, default=18, help="Duração da busca em segundos (5–120)")
+    scan.add_argument("--transport", choices=("all", "ble", "bluez", "classic"), default="all", help="all: BLE + BlueZ no Linux; ble: somente BLE; bluez: descoberta BlueZ (classic é alias legado)")
+    subparsers.add_parser("inventory", help="Mostra o inventário salvo")
+    subparsers.add_parser("audit", help="Faz check-up do adaptador Bluetooth local")
+    report = subparsers.add_parser("report", help="Gera um relatório HTML local")
     report.add_argument("--output", type=Path, default=None)
     return parser
 
@@ -41,11 +41,11 @@ def main() -> None:
         return
 
     app.banner()
-    app.console.print("[yellow]Authorized environments only. Passive BLE, standard Classic inquiry on Linux, and read-only local checks.[/yellow]")
-    if not Confirm.ask("Confirm authorization for this assessment", default=False, console=console):
+    app.console.print("[yellow]Use somente em dispositivos e ambientes autorizados. Pareamento e mídia são tratados pelo sistema operacional.[/yellow]")
+    if not Confirm.ask("Confirmo que tenho autorização para esta avaliação", default=False, console=console):
         console.print("[yellow]Authorization not confirmed. Exiting.[/yellow]")
         raise SystemExit(1)
-    append_audit_event(app.audit_log_path, "SESSION_AUTHORIZED", {"mode": "command_line", "command": args.command})
+    append_audit_event(app.audit_log_path, "SESSAO_AUTORIZADA", {"modo": "linha_de_comando", "comando": args.command})
 
     if args.command == "scan":
         app.live_discovery(duration=max(5, min(args.duration, 120)), transports=args.transport)
@@ -69,13 +69,13 @@ def main() -> None:
                 adapter = {}
         output = args.output or (app.reports_dir / "assessment.html")
         path = render_html_report(devices, adapter, output)
-        append_audit_event(app.audit_log_path, "HTML_REPORT_GENERATED", {"device_count": len(devices)})
-        console.print(f"[green]Report generated: {path.resolve()}[/green]")
+        append_audit_event(app.audit_log_path, "RELATORIO_GERADO", {"device_count": len(devices)})
+        console.print(f"[green]Relatório gerado: {path.resolve()}[/green]")
 
 
 if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print("\nSession interrupted.", file=sys.stderr)
+        print("\nSessão interrompida.", file=sys.stderr)
         raise SystemExit(130)

@@ -1,3 +1,3 @@
-"""BT SENTINEL: interactive, passive Bluetooth inventory and assessment."""
+"""BT SENTINEL: authorized Bluetooth discovery, inventory and local media controls."""
 
-__version__ = "3.0.0"
+__version__ = "4.0.0"

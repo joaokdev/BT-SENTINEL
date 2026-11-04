@@ -1,27 +1,23 @@
-# Limites de segurança
+# Limites de segurança e modelo operacional
 
-O BT SENTINEL foi projetado para observação BLE passiva, consulta Bluetooth Classic padrão sem conexão e revisão defensiva local.
+BT SENTINEL 4.0 é uma ferramenta educacional de descoberta autorizada e controle de mídia local.
 
-### Incluído
+## Operações permitidas pelo projeto
 
-- Escuta de anúncios BLE.
-- Descoberta Bluetooth Classic no Linux por meio das ferramentas locais BlueZ.
-- Consultas somente leitura do adaptador Bluetooth local.
-- Inventário JSON local e geração de relatório HTML.
+- Escutar anúncios BLE em modo passivo onde o backend e o adaptador suportarem.
+- Acionar a descoberta padrão do BlueZ no Linux.
+- Registrar somente metadados observados e a configuração do adaptador local.
+- Classificar prováveis famílias de dispositivos com base em nome/UUIDs anunciados, informando incerteza.
+- Abrir a tela Bluetooth oficial do sistema operacional para pareamento normal.
+- Controlar a sessão local de mídia/volume e selecionar saída pelo sistema operacional.
 
-### Excluído por projeto
+## Não implementado
 
-- Pareamento forçado, tentativa de PIN ou bypass de autenticação.
-- Escritas GATT, alterações remotas de configuração ou enumeração de serviços remotos.
-- Injeção de áudio, tomada de controle de mídia ou controle de dispositivos.
-- Spoofing de MAC, interferência de rádio, flooding ou negação de serviço.
-- Execução de exploits, entrega de payloads, persistência ou coleta de credenciais.
+- Pareamento forçado, PIN bypass, exploração ou acesso remoto.
+- Conexão automática a aparelhos encontrados.
+- Escrita GATT, alteração de firmware/configuração de terceiros, injeção de áudio ou tomada de controle.
+- Spoofing, flooding, interferência, jamming ou DoS.
 
-### Checklist de operação segura
+## Garantias e limitações
 
-1. Obtenha autorização explícita antes de iniciar a descoberta.
-2. Execute varreduras em laboratório controlado ou área física aprovada.
-3. Mantenha a duração no mínimo necessário.
-4. Revise inventário e relatórios antes de compartilhá-los.
-5. Exclua os dados coletados ao final do prazo de retenção aprovado.
-6. Trate campos desconhecidos ou ausentes como desconhecidos, não como evidência de segurança.
+O identificador Bluetooth é metadado de observação e não uma credencial. Controles de mídia são emitidos ao sistema operacional e afetam sua sessão/saída padrão, não um alvo remoto escolhido por MAC. A classificação é heurística, e os registros podem estar incompletos ou ser aleatorizados.

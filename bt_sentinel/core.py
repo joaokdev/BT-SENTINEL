@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any
 
 from . import __version__
+from .device_intel import classify_device
 
 MAC_RE = re.compile(r"^(?:[0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$")
 MAC_SEARCH_RE = re.compile(r"(?i)(?:[0-9a-f]{2}:){5}[0-9a-f]{2}")
@@ -188,7 +189,7 @@ def parse_classic_device_line(line: str) -> dict[str, Any] | None:
     return {
         "address": address,
         "name": name or "Unknown",
-        "transport": "Classic",
+        "transport": "BlueZ",
         "rssi": None,
         "signal": "N/A",
         "service_uuids": [],
@@ -211,9 +212,11 @@ def render_html_report(devices: list[dict[str, Any]], adapter: dict[str, Any], o
         manufacturer_data = record.get("manufacturer_data") or {}
         manufacturer = ", ".join(str(value) for value in manufacturer_data.keys()) if isinstance(manufacturer_data, dict) else "—"
         manufacturer = manufacturer or "—"
+        profile = classify_device(record)
         rows.append(
             "<tr>"
             f"<td>{escape(str(record.get('name', 'Unknown')))}</td>"
+            f"<td>{escape(profile['category'])} <span class=\"muted\">({escape(profile['confidence'].lower())})</span></td>"
             f"<td><code>{escape(str(record.get('address', '')))}</code></td>"
             f"<td>{escape(str(record.get('transport', '—')))}</td>"
             f"<td>{escape(str(record.get('rssi') if record.get('rssi') is not None else '—'))}</td>"
@@ -243,13 +246,13 @@ main{{max-width:1200px;margin:0 auto;padding:42px 24px}}header{{border-bottom:1p
 .metrics{{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}}.metric{{padding:13px;border:1px solid var(--line);border-radius:12px;display:flex;flex-direction:column;gap:6px}}.metric span{{color:var(--muted);font-size:12px}}.metric strong{{overflow-wrap:anywhere}}
 .table-wrap{{overflow-x:auto}}table{{width:100%;border-collapse:collapse;min-width:850px}}th,td{{text-align:left;padding:12px;border-bottom:1px solid var(--line);vertical-align:top}}th{{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.08em}}code{{color:var(--accent)}}
 .notice{{border-left:3px solid var(--accent);padding:12px 16px;background:#112522;border-radius:5px;color:#ccece2}}footer{{color:var(--muted);font-size:12px;padding:24px 0}}
-</style></head><body><main><header><div class="eyebrow">BT SENTINEL / SECURITY OBSERVABILITY</div>
-<h1>Avaliação Bluetooth</h1><p>Gerado em {escape(generated)} · Observações de descoberta e consulta local</p></header>
+</style></head><body><main><header><div class="eyebrow">PAI JOÃO K DEV / BT SENTINEL</div>
+<h1>Relatório de Inteligência Bluetooth</h1><p>Gerado em {escape(generated)} · Observações de descoberta e consulta local</p></header>
 <div class="notice"><strong>Interpretação:</strong> metadados de descoberta não comprovam vulnerabilidade, possibilidade de exploração, propriedade do dispositivo ou identidade de usuário. Dispositivos podem usar endereços aleatorizados e anúncios incompletos.</div>
-<section class="panel"><h2>Inventário · {len(devices)} dispositivo(s)</h2><div class="table-wrap"><table><thead><tr><th>Nome</th><th>Endereço / ID</th><th>Transporte</th><th>RSSI</th><th>Serviços anunciados</th><th>IDs de fabricante</th><th>Visto por último</th></tr></thead>
-<tbody>{''.join(rows) if rows else '<tr><td colspan="7">Nenhum dispositivo registrado.</td></tr>'}</tbody></table></div></section>
+<section class="panel"><h2>Inventário · {len(devices)} dispositivo(s)</h2><div class="table-wrap"><table><thead><tr><th>Nome</th><th>Categoria estimada</th><th>Endereço / ID</th><th>Transporte</th><th>RSSI</th><th>Serviços anunciados</th><th>IDs de fabricante</th><th>Visto por último</th></tr></thead>
+<tbody>{''.join(rows) if rows else '<tr><td colspan="8">Nenhum dispositivo registrado.</td></tr>'}</tbody></table></div></section>
 <section class="panel"><h2>Retrato do adaptador local</h2><div class="metrics">{''.join(adapter_rows)}</div></section>
-<section class="panel"><h2>Limites da avaliação</h2><p>Este relatório contém observações de rádio e uma fotografia local do adaptador. Não executa exploits, não se conecta aos dispositivos encontrados, não enumera serviços remotos, não escreve características GATT, não pareia, não injeta áudio, não falsifica endereços, não faz flooding e não executa negação de serviço.</p><p>Valide a postura de segurança com inventários de ativos fornecidos pelos responsáveis, avisos dos fabricantes e procedimentos controlados de avaliação.</p></section>
+<section class="panel"><h2>Limites da avaliação</h2><p>A categoria é uma hipótese calculada a partir do nome e dos UUIDs anunciados; não confirma fabricante, modelo, dono, serviço acessível ou vulnerabilidade. Este relatório contém observações de rádio e uma fotografia local do adaptador. Não executa exploits, não se conecta aos dispositivos encontrados, não enumera serviços remotos, não escreve características GATT, não faz pareamento forçado, não injeta áudio, não falsifica endereços, não faz flooding e não executa negação de serviço.</p><p>Valide a postura de segurança com inventários de ativos fornecidos pelos responsáveis, avisos dos fabricantes e procedimentos controlados de avaliação.</p></section>
 <footer>BT SENTINEL {escape(__version__)} · Projeto educacional · Somente ambientes autorizados</footer>
 </main></body></html>"""
     output.write_text(html, encoding="utf-8")
