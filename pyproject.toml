@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bt-sentinel"
+version = "3.0.0"
+description = "Interactive Bluetooth inventory with passive BLE discovery and local assessment"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "bleak>=3.0.2,<4.0",
+  "rich>=15.0.0,<16.0",
+]
+
+[project.scripts]
+bt-sentinel = "bt_sentinel.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["bt_sentinel*"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
